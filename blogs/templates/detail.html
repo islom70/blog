@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .like-button {
+        font-size: 1.5rem;
+        text-decoration: none;
+    }
+    .like-button .fa-heart {
+        transition: color 0.3s;
+    }
+    .like-button:hover .fa-heart {
+        color: red;
+    }
+
+</style>
+<link rel="stylesheet" href="{% static 'css/comment_button.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="row tm-row">
+    <div class="col-12">
+        <hr class="tm-hr-primary tm-mb-55">
+        <!-- Video player 1422x800 -->
+        {% if blog.video %}
+        <video width="954" height="535" controls class="tm-mb-40">
+            <source src="{{ blog.video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        {% else %}
+        <img width="954" height="535" class="tm-mb-40" src="{{ blog.photo.url }}"></img>
+        {% endif %}
+    </div>
+</div>
+<div class="row tm-row">
+    <div class="col-lg-8 tm-post-col">
+        <div class="tm-post-full">
+            <div class="mb-4">
+                <h2 class="pt-2 tm-color-primary tm-post-title">{{ blog.title }}</h2>
+                <p class="tm-mb-40">{{ blog.created_time }} | {{ blog.author.username }}</p>
+                <p>{{ blog.body }}</p>
+                <a href="{% url 'edit' blog.pk %}">Tahrirlash</a> |
+                <a href="{% url 'delete' blog.pk %}">O'chirish</a>
+                <span class="d-block text-right tm-color-primary">
+                    {% for tag in blog.tags.all %}
+                    #{{ tag.name }}
+                    {% endfor %}
+                </span>
+            </div>
+
+            <!-- Like Button -->
+            <div class="d-flex align-items-center">
+                <a href="" class="btn btn-link like-button" style="color: {% if 0 %}red{% else %}black{% endif %};">
+                    <i class="fa fa-heart"></i> 123
+                </a>
+            </div>
+
+            <div class="container">
+              <a class="button" href="#" style="--color:#1e9bff; width: 200px;" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Izoh qoldirish
+              </a>
+            </div>
+
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Izoh qoldirish</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Sizning izohingiz:</label>
+                        <textarea class="form-control" id="message-text" name="{{ comment_form.body.name }}"></textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+                        <button type="submit" class="btn btn-primary">Yuborish</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+
+            <!-- Comments -->
+            <div>
+                <h2 class="tm-color-primary tm-post-title">Izohlar</h2>
+                <hr class="tm-hr-primary tm-mb-45">
+                {% for comment in blog.comments.all %}
+                <div class="tm-comment tm-mb-45">
+                    <figure class="tm-comment-figure">
+                        <img src="{% static 'img/comment-1.jpg' %}" alt="Image" class="mb-2 rounded-circle img-thumbnail">
+                        <figcaption class="tm-color-primary text-center">{{ comment.author.username }}</figcaption>
+                    </figure>
+                    <div>
+                        <p>{{ comment.body }}</p>
+                        <div class="d-flex justify-content-between">
+                            <span class="tm-color-primary">{{ comment.created_time }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+    <aside class="col-lg-4 tm-aside-col">
+        <div class="tm-post-sidebar">
+            <hr class="mb-3 tm-hr-primary">
+            <h2 class="mb-4 tm-post-title tm-color-primary">Bo'limlar</h2>
+            <ul class="tm-mb-75 pl-5 tm-category-list">
+                {% for category in categories %}
+                <li><a href="#" class="tm-color-primary">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+            <hr class="mb-3 tm-hr-primary">
+            <h2 class="tm-mb-40 tm-post-title tm-color-primary">O'xshash bloglar</h2>
+            <a href="#" class="d-block tm-mb-40">
+                <figure>
+                    <img src="img/img-02.jpg" alt="Image" class="mb-3 img-fluid">
+                    <figcaption class="tm-color-primary">Duis mollis diam nec ex viverra scelerisque a sit</figcaption>
+                </figure>
+            </a>
+            <a href="#" class="d-block tm-mb-40">
+                <figure>
+                    <img src="img/img-05.jpg" alt="Image" class="mb-3 img-fluid">
+                    <figcaption class="tm-color-primary">Integer quis lectus eget justo ullamcorper ullamcorper</figcaption>
+                </figure>
+            </a>
+            <a href="#" class="d-block tm-mb-40">
+                <figure>
+                    <img src="img/img-06.jpg" alt="Image" class="mb-3 img-fluid">
+                    <figcaption class="tm-color-primary">Nam lobortis nunc sed faucibus commodo</figcaption>
+                </figure>
+            </a>
+        </div>
+    </aside>
+</div>
+{% endblock content %}
+
+{% block extra_js %}{% endblock extra_js %}
