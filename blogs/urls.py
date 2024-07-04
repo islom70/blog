@@ -1,11 +1,11 @@
 from django.urls import path
 
 from .views import home_page_view, HomePageView, HomePageGenericView, blog_detail_view, BlogDetailGenericView, \
-    contact_view, BlogUpdateGenericView, BlogDeleteGenericView, BlogCreateGenericView, about_view
+    contact_view, BlogUpdateGenericView, BlogDeleteGenericView, BlogCreateGenericView, about_view, SearchView
 
 urlpatterns = [
     # path('', home_page_view, name='home'),
-    # path('blogs/<int:pk>/', blog_detail_view, name='detail'),
+    # path('blogs/<int:pk>/', blog_detail_view, name='detail.html'),
     path('contact/', contact_view, name='contact'),
     path('about/', about_view, name='about'),
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('blogs/<slug:slug>/edit/', BlogUpdateGenericView.as_view(), name='edit'),
     path('blogs/<slug:slug>/delete/', BlogDeleteGenericView.as_view(), name='delete'),
     path('blog/create/', BlogCreateGenericView.as_view(), name='create'),
+    path('search/list/', SearchView.as_view(), name='search'),
 ]

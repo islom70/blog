@@ -14,7 +14,7 @@
 <form method="post" action="">
     {% csrf_token %}
     {{ form }}
-    <a href="{% url 'detail' blog.pk %}" class="button button-green">Yo'q</a>
+    <a href="{% url 'detail' blog.slug %}" class="button button-green">Yo'q</a>
     <button type="submit" class="button button-red">Ha</button>
 </form>
 

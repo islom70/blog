@@ -1,13 +1,14 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-
+from django.db.models import Q
 from blogs.models import Blog, Contact
 
-from blogs.forms import CommentCreateForm
+from blogs.forms import CommentCreateForm, BlogCreateForm
 
 
 # functional view
@@ -25,7 +26,7 @@ def blog_detail_view(request, pk):
         context = {
             'blog': blog
         }
-        return render(request, 'detail.html', context)
+        return render(request, 'detail.html.html', context)
     except Blog.DoesNotExist:
         return HttpResponse("Bunday sahifa mavjud emas!")
 
@@ -77,7 +78,7 @@ class BlogDetailView(View):
             context = {
                 'blog': blog
             }
-            return render(request, 'detail.html', context)
+            return render(request, 'detail.html.html', context)
         except Blog.DoesNotExist:
             return HttpResponse("Bunday sahifa mavjud emas!")
 
@@ -117,20 +118,49 @@ class BlogDetailGenericView(DetailView):
             return redirect(request.META.get('HTTP_REFERER'))
 
 
-class BlogCreateGenericView(CreateView):
-    model = Blog
+class BlogCreateGenericView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    form_class = BlogCreateForm
     template_name = 'create.html'
-    fields = ['author', 'title', 'body', 'photo', 'video', 'category', 'tags', ]
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        user = self.request.user
+        if user.is_superuser:
+            return True
+        return False
 
 
-class BlogUpdateGenericView(UpdateView):
+class BlogUpdateGenericView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Blog
     template_name = 'update.html'
     fields = ['title', 'body', 'photo', 'video']
 
+    def test_func(self):
+        user = self.request.user
+        return self.get_object().author == user
 
-class BlogDeleteGenericView(DeleteView):
+
+class BlogDeleteGenericView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Blog
     template_name = 'delete.html'
     success_url = reverse_lazy('home')
 
+    def test_func(self):
+        return self.get_object().author == self.request.user
+
+
+class SearchView(View):
+    def get(self, request):
+        query = request.GET.get('query')
+        if query:
+            blogs = Blog.objects.filter(
+                Q(body__icontains=query) | Q(title__icontains=query)
+            )
+            print(blogs)
+        else:
+            blogs = []
+        context = {'blogs': blogs}
+        return render(request, 'search.html', context)
